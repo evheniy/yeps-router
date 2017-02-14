@@ -3,9 +3,9 @@
 
 Promise based router for yeps
 
-[![NPM](https://nodei.co/npm/yeps.png)](https://npmjs.org/package/yeps-router)
+[![NPM](https://nodei.co/npm/yeps-router.png)](https://npmjs.org/package/yeps-router)
 
-[![npm version](https://badge.fury.io/js/yeps.svg)](https://badge.fury.io/js/yeps-router)
+[![npm version](https://badge.fury.io/js/yeps-router.svg)](https://badge.fury.io/js/yeps-router)
 [![Build Status](https://travis-ci.org/evheniy/yeps-router.svg?branch=master)](https://travis-ci.org/evheniy/yeps-router)
 [![Coverage Status](https://coveralls.io/repos/github/evheniy/yeps-router/badge.svg?branch=master)](https://coveralls.io/github/evheniy/yeps-router?branch=master)
 [![Linux Build](https://img.shields.io/travis/evheniy/yeps-router/master.svg?label=linux)](https://travis-ci.org/evheniy/)
