@@ -1,3 +1,5 @@
+const pause = require('promise-pause-timeout');
+
 const Router = class {
     constructor() {
         this.routes = [];
@@ -9,6 +11,7 @@ const Router = class {
         return {
             then(fn) {
                 routes.push(async ctx => {
+                    await pause(10);
                     if ((method === '*' || ctx.method === method) && ctx.url === url) {
                         return Promise.reject(fn);
                     } else {
@@ -46,7 +49,26 @@ router
     .post('678').then(console.log);
 router.catch().then(console.log);
 
-router.resolve({ method: 'GET', url: '456' });
-router.resolve({ method: 'POST', url: '678' });
-router.resolve({ method: 'POST', url: '123' });
-router.resolve({ method: 'GET', url: '/' });
+(async () => {
+    const start1 = new Date;
+    await router.resolve({ method: 'GET', url: '456' });
+    const ms1 = new Date - start1;
+    console.log(ms1);
+
+    await router.resolve({ method: 'POST', url: '678' });
+    await router.resolve({ method: 'POST', url: '123' });
+
+    const start = new Date;
+    await router.resolve({ method: 'GET', url: '/' });
+    const ms = new Date - start;
+    console.log(ms);
+})();
+
+/**
+ { method: 'GET', url: '456' }
+ 17
+ { method: 'POST', url: '678' }
+ { method: 'POST', url: '123' }
+ { method: 'GET', url: '/' }
+ 11
+*/
