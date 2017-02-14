@@ -50,17 +50,17 @@ router
 router.catch().then(console.log);
 
 (async () => {
-    const start1 = new Date;
+    const start1 = new Date();
     await router.resolve({ method: 'GET', url: '456' });
-    const ms1 = new Date - start1;
+    const ms1 = new Date() - start1;
     console.log(ms1);
 
     await router.resolve({ method: 'POST', url: '678' });
     await router.resolve({ method: 'POST', url: '123' });
 
-    const start = new Date;
+    const start = new Date();
     await router.resolve({ method: 'GET', url: '/' });
-    const ms = new Date - start;
+    const ms = new Date() - start;
     console.log(ms);
 })();
 
