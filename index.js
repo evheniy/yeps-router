@@ -1,21 +1,71 @@
-const pause = require('promise-pause-timeout');
+const pathToRegexp = require('path-to-regexp');
+const parser = require('url');
+const http = require('http');
+const App = require('yeps');
 
 const Router = class {
+
     constructor() {
         this.routes = [];
+        this.methods = [
+            'HEAD',
+            'OPTIONS',
+            'GET',
+            'PUT',
+            'PATCH',
+            'POST',
+            'DELETE',
+        ];
+        this.methods.forEach(method => {
+            this[method.toLowerCase()] = url => {
+                return this.catch({ method, url });
+            };
+        });
+        this.del = this.delete;
     }
 
-    catch({ method = '*', url = '/'} = {}) {
+    all(url) {
+        return this.catch({ method: '*', url });
+    }
+
+    resolve() {
+        return ctx => {
+            return Promise.all(this.routes.map(route => route(ctx)))
+                .then(() => console.log(404))
+                .catch(async fn => {
+                    await fn(ctx);
+                    return Promise.reject();
+                });
+        };
+    }
+
+    catch({ method = '*', url = '/' } = {}) {
         const routes = this.routes;
         const that = this;
         return {
             then(fn) {
                 routes.push(async ctx => {
-                    await pause(10);
-                    if ((method === '*' || ctx.method === method) && ctx.url === url) {
+
+                    const paramNames = [];
+                    const parsedUrl = parser.parse(ctx.req.url, true);
+                    const regexp = pathToRegexp(url, paramNames);
+
+
+                    if ((method === '*' || ctx.req.method.toUpperCase() === method.toUpperCase()) && regexp.test(parsedUrl.pathname)) {
+
+                        ctx.query = parsedUrl.query;
+                        ctx.params = {};
+                        const captures = parsedUrl.pathname.match(regexp).slice(1);
+                        for (let len = captures.length, i = 0; i < len; i++) {
+                            if (paramNames[i]) {
+                                let c = captures[i];
+                                ctx.params[paramNames[i].name] = decodeURIComponent(c);
+                            }
+                        }
+
                         return Promise.reject(fn);
                     } else {
-                        return Promise.resolve();
+                        return Promise.resolve(ctx);
                     }
                 });
                 return that;
@@ -23,52 +73,37 @@ const Router = class {
         };
     }
 
-    all(url) {
-        return this.catch({method: '*', url});
-    }
-
-    get(url) {
-        return this.catch({method: 'GET', url});
-    }
-
-    post(url) {
-        return this.catch({method: 'POST', url});
-    }
-
-    resolve(ctx) {
-        return Promise.all(this.routes.map(route => route(ctx))).catch(fn => fn(ctx));
-    }
-
 };
 
+
+const app = new App();
 const router = new Router();
 
-router.all('123').then(console.log);
-router
-    .get('456').then(console.log)
-    .post('678').then(console.log);
-router.catch().then(console.log);
 
-(async () => {
-    const start1 = new Date();
-    await router.resolve({ method: 'GET', url: '456' });
-    const ms1 = new Date() - start1;
-    console.log(ms1);
+router.catch().then(async ctx => {
+    ctx.res.writeHead(200, { 'Content-Type': 'text/plain' });
+    ctx.res.end('homepage');
+});
+router.get('/test/:id/:data').then(async ctx => {
+    console.log(ctx.query);
+    console.log(ctx.params);
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.write(JSON.stringify(Object.assign({}, ctx.query, ctx.params)));
+    ctx.res.end();
+});
 
-    await router.resolve({ method: 'POST', url: '678' });
-    await router.resolve({ method: 'POST', url: '123' });
+app.then(router.resolve());
 
-    const start = new Date();
-    await router.resolve({ method: 'GET', url: '/' });
-    const ms = new Date() - start;
-    console.log(ms);
-})();
+// 404
+app.then(async ctx => {
+    ctx.res.writeHead(404);
+    ctx.res.end('Not Found');
+});
 
-/**
- { method: 'GET', url: '456' }
- 17
- { method: 'POST', url: '678' }
- { method: 'POST', url: '123' }
- { method: 'GET', url: '/' }
- 11
-*/
+app.catch(async (err, ctx) => {
+    ctx.res.writeHead(500);
+    ctx.res.end(err.message);
+});
+
+http.createServer(app.resolve()).listen(3000);
+console.log('http://localhost:3000/test/1/2?data=123');

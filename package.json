@@ -55,6 +55,10 @@
     "npm-run-all": "^4.0.1",
     "nsp": "^2.6.2",
     "promise-pause-timeout": "0.0.1",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.5.4",
+    "yeps": "^0.0.10"
+  },
+  "dependencies": {
+    "path-to-regexp": "^1.7.0"
   }
 }
