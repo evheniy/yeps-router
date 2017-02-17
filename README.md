@@ -22,3 +22,79 @@ Promise based router for yeps
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/evheniy/yeps-router.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 
+## How to install
+
+  npm i -S yeps-router
+  
+## How to use
+
+    const App = require('yeps');    
+    const Router = require('yeps-router');
+    const error = require('yeps-error');
+    
+    const app = new App();
+    
+    app.all([error()]);
+    
+    const router = new Router();
+    
+    router.get('/').then(async ctx => {
+       ctx.res.writeHead(200);
+       ctx.res.end('homepage');     
+    });
+    
+    app.then(router.resolve());
+    
+## Methods
+
+* all()
+* head(url)
+* options(url)
+* get(url)
+* post(url)
+* patch(url)
+* post(url)
+* delete(url) or del(url)
+
+All methods are wrapers for catch() method:
+
+catch({ method: 'GET', url: '/' })
+
+    router.catch().then(async ctx => {
+        ctx.res.writeHead(200);
+        ctx.res.end('homepage');     
+    });
+    
+    router.catch({ method: 'POST' }).then(async ctx => {
+        ctx.res.writeHead(200);
+        ctx.res.end('homepage');     
+    });
+    
+    router.catch({ url: '/data' }).then(async ctx => {
+        ctx.res.writeHead(200);
+        ctx.res.end('homepage');     
+    });
+    
+    router.catch({ method: 'POST', url: '/data' }).then(async ctx => {
+        ctx.res.writeHead(200);
+        ctx.res.end('homepage');     
+    });
+
+## Chain
+
+You can use chain of methods:
+
+    router.get('/').then(async ctx => {
+       ctx.res.writeHead(200);
+       ctx.res.end('homepage');     
+    }).post('/data').then(async ctx => {
+        ctx.res.writeHead(200);
+        ctx.res.end('homepage');     
+    });
+
+## Links
+
+* [yeps](https://github.com/evheniy/yeps)
+* [yeps-error](https://github.com/evheniy/yeps-error)
+     
+     

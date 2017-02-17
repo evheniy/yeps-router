@@ -71,10 +71,7 @@ module.exports = class {
 
                         const captures = parsedUrl.pathname.match(regexp).slice(1);
                         for (let len = captures.length, i = 0; i < len; i++) {
-                            if (paramNames[i]) {
-                                let c = captures[i];
-                                ctx.request.params[paramNames[i].name] = decodeURIComponent(c);
-                            }
+                            ctx.request.params[paramNames[i].name] = decodeURIComponent(captures[i]);
                         }
 
                         return Promise.reject(fn);

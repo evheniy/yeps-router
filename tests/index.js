@@ -956,4 +956,25 @@ describe('YEPS router test', () => {
         expect(isTestFinished3).is.true;
     });
 
+    it('should test catch 404 error with wrong params', async() => {
+
+        let isTestFinished = false;
+
+        router.catch({ url: '/test/:id1/:id2'}).then(async ctx => {
+            ctx.res.writeHead(200);
+            ctx.res.end('homepage');
+        });
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/test/1/2/3')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(404);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
 });
