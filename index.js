@@ -1,11 +1,12 @@
+const debug = require('debug')('yeps:router');
 const pathToRegexp = require('path-to-regexp');
 const parser = require('url');
-const http = require('http');
-const App = require('yeps');
 
-const Router = class {
+module.exports = class {
 
     constructor() {
+        debug('Router created');
+
         this.routes = [];
         this.methods = [
             'HEAD',
@@ -16,8 +17,10 @@ const Router = class {
             'POST',
             'DELETE',
         ];
+
         this.methods.forEach(method => {
             this[method.toLowerCase()] = url => {
+                debug('%s %s', method.toUpperCase(), url);
                 return this.catch({ method, url });
             };
         });
@@ -25,13 +28,19 @@ const Router = class {
     }
 
     all(url) {
+        debug('* %s', url);
+
         return this.catch({ method: '*', url });
     }
 
     resolve() {
+        debug('Router started');
+
         return ctx => {
+            debug(ctx.req.url);
+
             return Promise.all(this.routes.map(route => route(ctx)))
-                .then(() => console.log(404))
+                .then(() => debug('Router not found'))
                 .catch(async fn => {
                     await fn(ctx);
                     return Promise.reject();
@@ -42,6 +51,7 @@ const Router = class {
     catch({ method = '*', url = '/' } = {}) {
         const routes = this.routes;
         const that = this;
+
         return {
             then(fn) {
                 routes.push(async ctx => {
@@ -50,16 +60,20 @@ const Router = class {
                     const parsedUrl = parser.parse(ctx.req.url, true);
                     const regexp = pathToRegexp(url, paramNames);
 
-
                     if ((method === '*' || ctx.req.method.toUpperCase() === method.toUpperCase()) && regexp.test(parsedUrl.pathname)) {
 
-                        ctx.query = parsedUrl.query;
-                        ctx.params = {};
+                        debug('Router found');
+                        debug('%s %s', ctx.req.method.toUpperCase(), url);
+
+                        ctx.request = ctx.request || {};
+                        ctx.request.query = parsedUrl.query;
+                        ctx.request.params = {};
+
                         const captures = parsedUrl.pathname.match(regexp).slice(1);
                         for (let len = captures.length, i = 0; i < len; i++) {
                             if (paramNames[i]) {
                                 let c = captures[i];
-                                ctx.params[paramNames[i].name] = decodeURIComponent(c);
+                                ctx.request.params[paramNames[i].name] = decodeURIComponent(c);
                             }
                         }
 
@@ -68,42 +82,10 @@ const Router = class {
                         return Promise.resolve(ctx);
                     }
                 });
+
                 return that;
             }
         };
     }
 
 };
-
-
-const app = new App();
-const router = new Router();
-
-
-router.catch().then(async ctx => {
-    ctx.res.writeHead(200, { 'Content-Type': 'text/plain' });
-    ctx.res.end('homepage');
-});
-router.get('/test/:id/:data').then(async ctx => {
-    console.log(ctx.query);
-    console.log(ctx.params);
-    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
-    ctx.res.write(JSON.stringify(Object.assign({}, ctx.query, ctx.params)));
-    ctx.res.end();
-});
-
-app.then(router.resolve());
-
-// 404
-app.then(async ctx => {
-    ctx.res.writeHead(404);
-    ctx.res.end('Not Found');
-});
-
-app.catch(async (err, ctx) => {
-    ctx.res.writeHead(500);
-    ctx.res.end(err.message);
-});
-
-http.createServer(app.resolve()).listen(3000);
-console.log('http://localhost:3000/test/1/2?data=123');
