@@ -1,7 +1,7 @@
 # YEPS Router
 
 
-Promise based router for yeps
+YEPS promise based router
 
 [![NPM](https://nodei.co/npm/yeps-router.png)](https://npmjs.org/package/yeps-router)
 
@@ -34,7 +34,9 @@ Promise based router for yeps
     
     const app = new App();
     
-    app.all([error()]);
+    app.all([
+        error(),
+    ]);
     
     const router = new Router();
     
@@ -47,7 +49,7 @@ Promise based router for yeps
     
 ## Methods
 
-* all()
+* all(url)
 * head(url)
 * options(url)
 * get(url)
@@ -56,7 +58,7 @@ Promise based router for yeps
 * post(url)
 * delete(url) or del(url)
 
-All methods are wrapers for catch() method:
+All methods are wrappers for catch() method:
 
 catch({ method: 'GET', url: '/' })
 
@@ -85,16 +87,24 @@ catch({ method: 'GET', url: '/' })
 You can use chain of methods:
 
     router.get('/').then(async ctx => {
+       
        ctx.res.writeHead(200);
        ctx.res.end('homepage');     
+    
     }).post('/data').then(async ctx => {
+    
         ctx.res.writeHead(200);
         ctx.res.end('homepage');     
+    
     });
 
 ## Links
 
-* [yeps](https://github.com/evheniy/yeps)
-* [yeps-error](https://github.com/evheniy/yeps-error)
+* [yeps](https://github.com/evheniy/yeps) - YEPS
+* [yeps-benchmark](https://github.com/evheniy/yeps-benchmark) - performance comparison koa2, express and node http
+* [yeps-error](https://github.com/evheniy/yeps-error) - YEPS 404/500 error handler
+* [yeps-redis](https://github.com/evheniy/yeps-redis) - YEPS promise based redis client - ioredis
+* [yeps-logger](https://github.com/evheniy/yeps-logger) - YEPS Async logger - winston
+* [yeps-boilerplate](https://github.com/evheniy/yeps-boilerplate) - YEPS app boilerplate
      
      

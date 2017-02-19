@@ -13,7 +13,9 @@ describe('YEPS router test', () => {
 
     beforeEach(() => {
         app = new App();
-        app.all([error()]);
+        app.all([
+            error(),
+        ]);
         router = new Router();
     });
 

@@ -1,12 +1,12 @@
 {
   "name": "yeps-router",
-  "version": "0.0.3",
-  "description": "Promise based router for YEPS",
+  "version": "0.0.4",
+  "description": "YEPS promise based router",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/npm-run-all lint:**",
+    "lint": "./node_modules/.bin/npm-run-all --parallel lint:**",
     "lint:js": "./node_modules/.bin/eslint index.js tests",
-    "test": "./node_modules/.bin/npm-run-all test:**",
+    "test": "./node_modules/.bin/npm-run-all --parallel test:**",
     "test:security": "./node_modules/.bin/nsp check",
     "test:code": "node --harmony ./node_modules/mocha/bin/_mocha tests --recursive",
     "test:coverage": "node --harmony ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- tests --recursive",
@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "path-to-regexp": "^1.7.0",
-    "yeps": "^0.0.14",
-    "yeps-error": "^0.0.4"
+    "yeps": "*",
+    "yeps-error": "*"
   }
 }
