@@ -41,6 +41,118 @@ describe('YEPS router test', () => {
         expect(isTestFinished).is.true;
     });
 
+    it('should test catch with error', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => {
+            throw new Error();
+        });
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
+    it('should test catch with error and message', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => {
+            throw new Error('test');
+        });
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
+    it('should test catch with reject', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => Promise.reject());
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
+    it('should test catch with reject and message', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => Promise.reject('test'));
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
+    it('should test catch with resolve', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => Promise.resolve());
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
+    it('should test catch with resolve and message', async() => {
+
+        let isTestFinished = false;
+
+        router.catch().then(async () => Promise.resolve());
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .get('/')
+            .send()
+            .catch(err => {
+                expect(err).to.have.status(500);
+                isTestFinished = true;
+            });
+
+        expect(isTestFinished).is.true;
+    });
+
     it('should test catch with url', async() => {
 
         let isTestFinished = false;
