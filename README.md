@@ -97,6 +97,28 @@ You can use chain of methods:
         ctx.res.end('homepage');     
     
     });
+    
+## Request parameters
+
+### Query
+
+url: /?data=test
+
+    router.get('/').then(async ctx => {
+        
+        ctx.request.query.data === 'test'      
+        
+    });
+    
+### Parameters
+
+url: /test/125
+    
+    router.get('/test/:id').then(async ctx => {
+        
+        ctx.request.params.id === '125'      
+        
+    });
 
 ## Links
 
