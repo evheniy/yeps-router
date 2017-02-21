@@ -82,4 +82,48 @@ describe('YEPS router post test', () => {
         expect(isTestFinished).is.true;
     });
 
+    /**
+     * to parse body use
+     * https://github.com/evheniy/yeps-express-wrapper
+     * with
+     * https://github.com/expressjs/body-parser
+     */
+    it('should test post with data', async() => {
+
+        let isTestFinished1 = false;
+        let isTestFinished2 = false;
+
+        router.post('/test').then(async ctx => {
+
+            const promise = new Promise((resolve, reject) => {
+                const body = [];
+                ctx.req.on('data', chunk => {
+                    body.push(chunk);
+                }).on('end', () => {
+                    resolve(Buffer.concat(body).toString());
+                }).on('error', reject);
+            });
+
+            expect(await promise).to.have.string('test_data');
+
+            isTestFinished1 = true;
+
+            ctx.res.writeHead(200);
+            ctx.res.end('test');
+        });
+        app.then(router.resolve());
+
+        await chai.request(http.createServer(app.resolve()))
+            .post('/test')
+            .field('test', 'test_data')
+            .send()
+            .then(res => {
+                expect(res).to.have.status(200);
+                isTestFinished2 = true;
+            });
+
+        expect(isTestFinished1).is.true;
+        expect(isTestFinished2).is.true;
+    });
+
 });
