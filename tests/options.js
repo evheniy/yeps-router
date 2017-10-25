@@ -2,84 +2,88 @@ const App = require('yeps');
 const error = require('yeps-error');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const http = require('http');
-const expect = chai.expect;
+const srv = require('yeps-server');
 const Router = require('..');
 
+const { expect } = chai;
+
 chai.use(chaiHttp);
-let app, router;
+let app;
+let router;
+let server;
 
 describe('YEPS router options test', () => {
+  beforeEach(() => {
+    app = new App();
+    app.all([
+      error(),
+    ]);
+    router = new Router();
+    app.then(router.resolve());
+    server = srv.createHttpServer(app);
+  });
 
-    beforeEach(() => {
-        app = new App();
-        app.all([
-            error(),
-        ]);
-        router = new Router();
+  afterEach(() => {
+    server.close();
+  });
+
+  it('should test options', async () => {
+    let isTestFinished = false;
+
+    router.options('/test').then(async (ctx) => {
+      ctx.res.statusCode = 200;
+      ctx.res.end('homepage');
     });
+    app.then(router.resolve());
 
-    it('should test options', async() => {
+    await chai.request(server)
+      .options('/test')
+      .send()
+      .then((res) => {
+        expect(res).to.have.status(200);
+        isTestFinished = true;
+      });
 
-        let isTestFinished = false;
+    expect(isTestFinished).is.true;
+  });
 
-        router.options('/test').then(async ctx => {
-            ctx.res.writeHead(200);
-            ctx.res.end('homepage');
-        });
-        app.then(router.resolve());
+  it('should test options with 404', async () => {
+    let isTestFinished = false;
 
-        await chai.request(http.createServer(app.resolve()))
-            .options('/test')
-            .send()
-            .then(res => {
-                expect(res).to.have.status(200);
-                isTestFinished = true;
-            });
-
-        expect(isTestFinished).is.true;
+    router.options('/test').then(async (ctx) => {
+      ctx.res.statusCode = 200;
+      ctx.res.end('homepage');
     });
+    app.then(router.resolve());
 
-    it('should test options with 404', async() => {
+    await chai.request(server)
+      .options('/test1')
+      .send()
+      .catch((err) => {
+        expect(err).to.have.status(404);
+        isTestFinished = true;
+      });
 
-        let isTestFinished = false;
+    expect(isTestFinished).is.true;
+  });
 
-        router.options('/test').then(async ctx => {
-            ctx.res.writeHead(200);
-            ctx.res.end('homepage');
-        });
-        app.then(router.resolve());
+  it('should test options with 404 wrong method', async () => {
+    let isTestFinished = false;
 
-        await chai.request(http.createServer(app.resolve()))
-            .options('/test1')
-            .send()
-            .catch(err => {
-                expect(err).to.have.status(404);
-                isTestFinished = true;
-            });
-
-        expect(isTestFinished).is.true;
+    router.options('/test').then(async (ctx) => {
+      ctx.res.statusCode = 200;
+      ctx.res.end('homepage');
     });
+    app.then(router.resolve());
 
-    it('should test options with 404 wrong method', async() => {
+    await chai.request(server)
+      .get('/test')
+      .send()
+      .catch((err) => {
+        expect(err).to.have.status(404);
+        isTestFinished = true;
+      });
 
-        let isTestFinished = false;
-
-        router.options('/test').then(async ctx => {
-            ctx.res.writeHead(200);
-            ctx.res.end('homepage');
-        });
-        app.then(router.resolve());
-
-        await chai.request(http.createServer(app.resolve()))
-            .get('/test')
-            .send()
-            .catch(err => {
-                expect(err).to.have.status(404);
-                isTestFinished = true;
-            });
-
-        expect(isTestFinished).is.true;
-    });
-
+    expect(isTestFinished).is.true;
+  });
 });

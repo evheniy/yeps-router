@@ -41,7 +41,7 @@ YEPS promise based router
     const router = new Router();
     
     router.get('/').then(async ctx => {
-       ctx.res.writeHead(200);
+       ctx.res.statusCode = 200;
        ctx.res.end('homepage');     
     });
     
@@ -63,22 +63,22 @@ All methods are wrappers for catch() method:
 catch({ method: 'GET', url: '/' })
 
     router.catch().then(async ctx => {
-        ctx.res.writeHead(200);
+        ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
     router.catch({ method: 'POST' }).then(async ctx => {
-        ctx.res.writeHead(200);
+        ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
     router.catch({ url: '/data' }).then(async ctx => {
-        ctx.res.writeHead(200);
+        ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
     router.catch({ method: 'POST', url: '/data' }).then(async ctx => {
-        ctx.res.writeHead(200);
+        ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
 
@@ -86,16 +86,12 @@ catch({ method: 'GET', url: '/' })
 
 You can use chain of methods:
 
-    router.get('/').then(async ctx => {
-       
-       ctx.res.writeHead(200);
+    router.get('/').then(async (ctx) => {
+       ctx.res.statusCode = 200;
        ctx.res.end('homepage');     
-    
-    }).post('/data').then(async ctx => {
-    
-        ctx.res.writeHead(200);
-        ctx.res.end('homepage');     
-    
+    }).post('/data').then(async (ctx) => {
+        ctx.res.statusCode = 200;
+        ctx.res.end('homepage');
     });
     
 ## Request parameters
@@ -104,30 +100,16 @@ You can use chain of methods:
 
 url: /?data=test
 
-    router.get('/').then(async ctx => {
-        
-        ctx.request.query.data === 'test'      
-        
+    router.get('/').then(async (ctx) => {
+        ctx.request.query.data === 'test'
     });
     
 ### Parameters
 
 url: /test/125
     
-    router.get('/test/:id').then(async ctx => {
-        
-        ctx.request.params.id === '125'      
-        
+    router.get('/test/:id').then(async (ctx) => {
+        ctx.request.params.id === '125'
     });
 
-## Links
-
-* [yeps](https://github.com/evheniy/yeps) - YEPS
-* [yeps-benchmark](https://github.com/evheniy/yeps-benchmark) - performance comparison koa2, express and node http
-* [yeps-error](https://github.com/evheniy/yeps-error) - YEPS 404/500 error handler
-* [yeps-redis](https://github.com/evheniy/yeps-redis) - YEPS promise based redis client - ioredis
-* [yeps-logger](https://github.com/evheniy/yeps-logger) - YEPS Async logger - winston
-* [yeps-boilerplate](https://github.com/evheniy/yeps-boilerplate) - YEPS app boilerplate
-* [yeps-express-wrapper](https://github.com/evheniy/yeps-express-wrapper) - YEPS express wrapper
-     
-     
+#### [YEPS documentation](http://yeps.info/)
