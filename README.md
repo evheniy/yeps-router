@@ -30,22 +30,33 @@ YEPS promise based router
 
     const App = require('yeps');    
     const Router = require('yeps-router');
+    
     const error = require('yeps-error');
+    const logger = require('yeps-logger');
+    const server = require('yeps-server');
+    
+    const bodyParser = require('yeps-bodyparser');
+    const methodOverride = require('yeps-method-override');
     
     const app = new App();
     
     app.all([
         error(),
+        logger(),
+        bodyParser(),
+        methodOverride()
     ]);
     
     const router = new Router();
     
-    router.get('/').then(async ctx => {
+    router.get('/').then(async (ctx) => {
        ctx.res.statusCode = 200;
        ctx.res.end('homepage');     
     });
     
     app.then(router.resolve());
+    
+    server.createHttpServer(app);
     
 ## Methods
 
@@ -62,22 +73,22 @@ All methods are wrappers for catch() method:
 
 catch({ method: 'GET', url: '/' })
 
-    router.catch().then(async ctx => {
+    router.catch().then(async (ctx) => {
         ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
-    router.catch({ method: 'POST' }).then(async ctx => {
+    router.catch({ method: 'POST' }).then(async (ctx) => {
         ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
-    router.catch({ url: '/data' }).then(async ctx => {
+    router.catch({ url: '/data' }).then(async (ctx) => {
         ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
     
-    router.catch({ method: 'POST', url: '/data' }).then(async ctx => {
+    router.catch({ method: 'POST', url: '/data' }).then(async (ctx) => {
         ctx.res.statusCode = 200;
         ctx.res.end('homepage');     
     });
@@ -111,5 +122,6 @@ url: /test/125
     router.get('/test/:id').then(async (ctx) => {
         ctx.request.params.id === '125'
     });
+
 
 #### [YEPS documentation](http://yeps.info/)
