@@ -24,7 +24,7 @@ YEPS promise based router
 
 ## How to install
 
-  npm i -S yeps-router
+    npm i -S yeps-router
   
 ## How to use
 
@@ -71,7 +71,7 @@ YEPS promise based router
 
 All methods are wrappers for catch() method:
 
-catch({ method: 'GET', url: '/' })
+**catch({ method: 'GET', url: '/' })**
 
     router.catch().then(async (ctx) => {
         ctx.res.statusCode = 200;
@@ -109,7 +109,7 @@ You can use chain of methods:
 
 ### Query
 
-url: /?data=test
+**url**: */?data=test*
 
     router.get('/').then(async (ctx) => {
         ctx.request.query.data === 'test'
@@ -117,7 +117,7 @@ url: /?data=test
     
 ### Parameters
 
-url: /test/125
+**url**: */test/125*
     
     router.get('/test/:id').then(async (ctx) => {
         ctx.request.params.id === '125'

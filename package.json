@@ -1,6 +1,6 @@
 {
   "name": "yeps-router",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "YEPS promise based router",
   "main": "index.js",
   "scripts": {
