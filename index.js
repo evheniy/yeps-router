@@ -54,25 +54,39 @@ module.exports = class {
     return {
       then(fn) {
         routes.push(async (ctx) => {
-          const paramNames = [];
-          const parsedUrl = parser.parse(ctx.req.url, true);
-          const regexp = pathToRegexp(url, paramNames);
+          if (method === '*' || ctx.req.method.toUpperCase() === method.toUpperCase()) {
+            if (ctx.req.url === url) {
+              debug('Router found');
+              debug('%s %s', ctx.req.method.toUpperCase(), url);
 
-          if ((method === '*' || ctx.req.method.toUpperCase() === method.toUpperCase()) && regexp.test(parsedUrl.pathname)) {
-            debug('Router found');
-            debug('%s %s', ctx.req.method.toUpperCase(), url);
+              ctx.request = ctx.request || {};
+              ctx.request.query = {};
+              ctx.request.params = {};
 
-            ctx.request = ctx.request || {};
-            ctx.request.query = parsedUrl.query;
-            ctx.request.params = {};
-
-            const captures = parsedUrl.pathname.match(regexp).slice(1);
-            for (let len = captures.length, i = 0; i < len; i++) {
-              ctx.request.params[paramNames[i].name] = decodeURIComponent(captures[i]);
+              return Promise.reject(fn);
             }
 
-            return Promise.reject(fn);
+            const paramNames = [];
+            const parsedUrl = parser.parse(ctx.req.url, true);
+            const regexp = pathToRegexp(url, paramNames);
+
+            if (regexp.test(parsedUrl.pathname)) {
+              debug('Router found');
+              debug('%s %s', ctx.req.method.toUpperCase(), url);
+
+              ctx.request = ctx.request || {};
+              ctx.request.query = parsedUrl.query;
+              ctx.request.params = {};
+
+              const captures = parsedUrl.pathname.match(regexp).slice(1);
+              for (let len = captures.length, i = 0; i < len; i++) {
+                ctx.request.params[paramNames[i].name] = decodeURIComponent(captures[i]);
+              }
+
+              return Promise.reject(fn);
+            }
           }
+
           return Promise.resolve(ctx);
         });
 
